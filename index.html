@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SEDS - REC | Space Exploration & Development Society</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        /* Reset and Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Rajdhani', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            color: #ffffff;
+            overflow: hidden;
+            height: 100vh;
+            position: relative;
+        }
+
+        /* Stars Background Animation */
+        .stars, .stars2, .stars3 {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .stars {
+            background: transparent url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="1" fill="white" opacity="0.8"/></svg>') repeat;
+            background-size: 200px 200px;
+            animation: stars 20s linear infinite;
+        }
+
+        .stars2 {
+            background: transparent url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="0.5" fill="white" opacity="0.6"/></svg>') repeat;
+            background-size: 300px 300px;
+            animation: stars 25s linear infinite;
+        }
+
+        .stars3 {
+            background: transparent url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="1.5" fill="white" opacity="0.4"/></svg>') repeat;
+            background-size: 150px 150px;
+            animation: stars 30s linear infinite;
+        }
+        @keyframes moveStars {
+            0% { background-position: 0 0; }
+            100% { background-position: 100vw 100vh; }
+        }
+
+        /* Loading Container */
+        .loading-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+        }
+
+        .loading-content {
+            text-align: center;
+            max-width: 550px;
+            width: 92vw; 
+            padding: 1.2rem 1rem;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
+        }
+
+        /* Logo Section */
+        .logo-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .logo-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo-icon {
+            font-size: 2.2rem;
+            color: #00d4ff;
+            animation: pulse 2s ease-in-out infinite;
+            text-shadow: 0 0 12px #00d4ff;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.1); opacity: 0.8; }
+        }
+
+        .main-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.7rem;
+            font-weight: 900;
+            background: linear-gradient(45deg, #00d4ff, #ff6b6b, #4ecdc4);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 3s ease-in-out infinite;
+            letter-spacing: 2px;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .subtitle {
+            font-size: 0.9rem;
+            color: #b0b0b0;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+
+        /* Loading Animation */
+        .loading-animation {
+            margin: 1.2rem 0 0.7rem 0;
+        }
+
+        .loading-bar {
+            width: 100%;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 0.7rem;
+            position: relative;
+        }
+
+        .loading-bar::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+
+        .loading-progress {
+            height: 100%;
+            background: linear-gradient(90deg, #00d4ff, #4ecdc4, #ff6b6b);
+            border-radius: 3px;
+            width: 0%;
+            transition: width 0.3s ease;
+            position: relative;
+        }
+
+        .loading-text {
+            font-size: 0.95rem;
+            color: #00d4ff;
+            margin-bottom: 0.3rem;
+            font-weight: 500;
+            min-height: 1.2rem;
+        }
+
+        .loading-percentage {
+            font-family: 'Orbitron', monospace;
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #ffffff;
+            text-shadow: 0 0 8px rgba(0, 212, 255, 0.5);
+        }
+
+        /* Status Grid */
+        .status-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.7rem;
+            margin: 1.1rem 0 0.7rem 0;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.6rem 0.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .status-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .status-icon {
+            font-size: 1.1rem;
+            color: #00d4ff;
+            width: 28px;
+            text-align: center;
+        }
+
+        .status-text {
+            flex: 1;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-indicator {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #ff4757;
+            animation: blink 1s infinite;
+        }
+
+        .status-indicator.online {
+            background: #2ed573;
+            animation: none;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+
+        /* Mission Statement */
+        .mission-statement {
+            margin-top: 1.1rem;
+            padding: 0.8rem;
+            background: rgba(0, 212, 255, 0.08);
+            border-radius: 8px;
+            border-left: 3px solid #00d4ff;
+        }
+
+        .mission-statement p {
+            font-style: italic;
+            font-size: 0.95rem;
+            color: #e0e0e0;
+            line-height: 1.5;
+        }
+
+        /* Floating Elements */
+        .floating-elements {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .floating-element {
+            position: absolute;
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.3);
+            animation: float var(--duration) ease-in-out infinite;
+            animation-delay: var(--delay);
+        }
+
+        .floating-element:nth-child(1) { top: 10%; left: 10%; }
+        .floating-element:nth-child(2) { top: 20%; right: 15%; }
+        .floating-element:nth-child(3) { bottom: 30%; left: 20%; }
+        .floating-element:nth-child(4) { bottom: 20%; right: 10%; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); opacity: 0.3; }
+            50% { transform: translateY(-10px) rotate(180deg); opacity: 0.8; }
+        }
+
+        /* Continue Button */
+        .continue-btn {
+            margin-top: 1.2rem;
+            padding: 0.7rem 1.2rem;
+            background: linear-gradient(45deg, #00d4ff, #4ecdc4);
+            border: none;
+            border-radius: 8px;
+            color: #ffffff;
+            font-family: 'Orbitron', monospace;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 2px 10px rgba(0, 212, 255, 0.2);
+        }
+
+        .continue-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(0, 212, 255, 0.25);
+        }
+
+        .continue-btn:active {
+            transform: translateY(0);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .loading-content {
+                max-width: 98vw;
+                padding: 0.8rem 0.5rem;
+            }
+            .main-title {
+                font-size: 1.2rem;
+            }
+            .subtitle {
+                font-size: 0.8rem;
+            }
+            .status-grid {
+                grid-template-columns: 1fr;
+                gap: 0.5rem;
+            }
+        }
+        @media (max-width: 480px) {
+            .logo-icon {
+                font-size: 1.3rem;
+            }
+            .main-title {
+                font-size: 1rem;
+            }
+            .loading-content {
+                padding: 0.5rem 0.2rem;
+            }
+            .status-item {
+                padding: 0.4rem 0.3rem;
+            }
+            .status-icon {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-container" id="loadingContainer">
+        <!-- Stars Background -->
+        <div class="stars"></div>
+        <div class="stars2"></div>
+        <div class="stars3"></div>
+        
+        <!-- Main Loading Content -->
+        <div class="loading-content">
+            <!-- Logo/Title Area -->
+            <div class="logo-section">
+                <div class="logo-container">
+                    <div class="logo-icon">
+                        <i class="fas fa-rocket"></i>
+                    </div>
+                    <h1 class="main-title">SEDS - REC</h1>
+                    <p class="subtitle">Space Exploration & Development Society</p>
+                </div>
+            </div>
+            
+            <!-- Loading Animation -->
+            <div class="loading-animation">
+                <div class="loading-bar">
+                    <div class="loading-progress" id="loadingProgress"></div>
+                </div>
+                <div class="loading-text" id="loadingText">Initializing Systems...</div>
+                <div class="loading-percentage" id="loadingPercentage">0%</div>
+            </div>
+            
+            <!-- Status Indicators -->
+            <div class="status-grid">
+                <div class="status-item">
+                    <div class="status-icon">
+                        <i class="fas fa-satellite"></i>
+                    </div>
+                    <div class="status-text">Navigation Systems</div>
+                    <div class="status-indicator" id="navStatus"></div>
+                </div>
+                <div class="status-item">
+                    <div class="status-icon">
+                        <i class="fas fa-microchip"></i>
+                    </div>
+                    <div class="status-text">Life Support</div>
+                    <div class="status-indicator" id="lifeStatus"></div>
+                </div>
+                <div class="status-item">
+                    <div class="status-icon">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <div class="status-text">Shield Systems</div>
+                    <div class="status-indicator" id="shieldStatus"></div>
+                </div>
+                <div class="status-item">
+                    <div class="status-icon">
+                        <i class="fas fa-cog"></i>
+                    </div>
+                    <div class="status-text">Engine Systems</div>
+                    <div class="status-indicator" id="engineStatus"></div>
+                </div>
+            </div>
+            
+            <!-- Mission Statement -->
+            <div class="mission-statement">
+                <p>"Advancing humanity's presence in space through innovation, education, and collaboration"</p>
+            </div>
+        </div>
+        
+        <!-- Floating Elements -->
+        <div class="floating-elements">
+            <div class="floating-element" style="--delay: 0s; --duration: 8s;">
+                <i class="fas fa-meteor"></i>
+            </div>
+            <div class="floating-element" style="--delay: 2s; --duration: 10s;">
+                <i class="fas fa-planet-ringed"></i>
+            </div>
+            <div class="floating-element" style="--delay: 4s; --duration: 12s;">
+                <i class="fas fa-satellite-dish"></i>
+            </div>
+            <div class="floating-element" style="--delay: 6s; --duration: 9s;">
+                <i class="fas fa-star"></i>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Space Loading System for SEDS - REC
+        class SpaceLoadingSystem {
+            constructor() {
+                this.progress = 0;
+                this.loadingSteps = [
+                    { text: "Initializing Systems...", duration: 1000 },
+                    { text: "Calibrating Navigation...", duration: 800 },
+                    { text: "Starting Life Support...", duration: 1200 },
+                    { text: "Activating Shield Systems...", duration: 900 },
+                    { text: "Powering Engine Systems...", duration: 1100 },
+                    { text: "Establishing Communication...", duration: 1000 },
+                    { text: "Running Final Checks...", duration: 800 },
+                    { text: "All Systems Online!", duration: 500 }
+                ];
+                
+                this.currentStep = 0;
+                this.isLoading = true;
+                
+                this.init();
+            }
+            
+            init() {
+                this.loadingProgress = document.getElementById('loadingProgress');
+                this.loadingText = document.getElementById('loadingText');
+                this.loadingPercentage = document.getElementById('loadingPercentage');
+                this.loadingContainer = document.getElementById('loadingContainer');
+                // No continueBtn
+                // Status indicators
+                this.navStatus = document.getElementById('navStatus');
+                this.lifeStatus = document.getElementById('lifeStatus');
+                this.shieldStatus = document.getElementById('shieldStatus');
+                this.engineStatus = document.getElementById('engineStatus');
+                this.startLoading();
+            }
+            
+            startLoading() {
+                this.updateLoadingStep();
+            }
+            
+            updateLoadingStep() {
+                if (this.currentStep >= this.loadingSteps.length) {
+                    this.completeLoading();
+                    return;
+                }
+                
+                const step = this.loadingSteps[this.currentStep];
+                this.loadingText.textContent = step.text;
+                // Calculate progress percentage
+                const stepProgress = (this.currentStep + 1) / this.loadingSteps.length;
+                const targetProgress = stepProgress * 100;
+                this.animateProgress(targetProgress, step.duration);
+                // Update status indicators based on current step
+                this.updateStatusIndicators(this.currentStep);
+                this.currentStep++;
+                setTimeout(() => {
+                    this.updateLoadingStep();
+                }, step.duration);
+            }
+            
+            animateProgress(targetProgress, duration) {
+                const startProgress = this.progress;
+                const startTime = Date.now();
+                const animate = () => {
+                    const elapsed = Date.now() - startTime;
+                    const progress = Math.min(elapsed / duration, 1);
+                    // Easing function for smooth animation
+                    const easeOutQuart = 1 - Math.pow(1 - progress, 4);
+                    this.progress = startProgress + (targetProgress - startProgress) * easeOutQuart;
+                    this.loadingProgress.style.width = `${this.progress}%`;
+                    this.loadingPercentage.textContent = `${Math.round(this.progress)}%`;
+                    if (progress < 1) {
+                        requestAnimationFrame(animate);
+                    }
+                };
+                animate();
+            }
+            
+            updateStatusIndicators(stepIndex) {
+                const statusMap = [
+                    { element: this.navStatus, step: 1 },
+                    { element: this.lifeStatus, step: 2 },
+                    { element: this.shieldStatus, step: 3 },
+                    { element: this.engineStatus, step: 4 }
+                ];
+                statusMap.forEach(({ element, step }) => {
+                    if (stepIndex >= step) {
+                        setTimeout(() => {
+                            element.classList.add('online');
+                        }, 200);
+                    }
+                });
+            }
+            
+            completeLoading() {
+                setTimeout(() => {
+                    window.location.href = 'home.html';
+                }, 900); // Short delay for smoothness
+            }
+        }
+
+        // Initialize everything when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            // Start loading system
+            const loadingSystem = new SpaceLoadingSystem();
+            
+            // Add some interactive effects
+            document.addEventListener('mousemove', (e) => {
+                const mouseX = e.clientX / window.innerWidth;
+                const mouseY = e.clientY / window.innerHeight;
+                
+                // Subtle parallax effect on floating elements
+                const floatingElements = document.querySelectorAll('.floating-element');
+                floatingElements.forEach((element, index) => {
+                    const speed = (index + 1) * 0.5;
+                    const x = (mouseX - 0.5) * speed;
+                    const y = (mouseY - 0.5) * speed;
+                    element.style.transform = `translate(${x}px, ${y}px)`;
+                });
+            });
+            
+            // Add keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    // Quick access to home page
+                    if (document.getElementById('continueBtn').style.display !== 'none') {
+                        window.location.href = 'home.html';
+                    }
+                }
+            });
+        });
+
+        // Add fadeIn animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(20px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
